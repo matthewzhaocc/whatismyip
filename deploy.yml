@@ -1,0 +1,45 @@
+---
+- hosts: webservers
+  tasks:
+    - name: install golang
+      apt:
+        name: golang
+        state: present
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present
+    - name: install git
+      apt:
+        name: git
+        state: present
+    - name: clone repo
+      shell: git clone https://github.com/matthewzhaocc/whatismyip
+      args:
+        chdir: /
+    - name: compile app
+      shell: go build .
+      args:
+        chdir: /whatismyip/
+    - name: setup nginx
+      become: true
+      copy:
+        src: ip.conf
+        dest: /etc/nginx/sites-enabled/
+        mode: 400
+        owner: www-data
+    - name: install systemd
+      become: true
+      copy:
+        src: whatismyip.service
+        dest: /lib/systemd/
+        mode: 700
+        owner: root
+    - name: start golang daemon service
+      systemd:
+        state: started
+        name: whatismyip
+    - name: start nginx
+      systemd:
+        state: started
+        name: nginx

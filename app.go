@@ -8,8 +8,8 @@ import (
 
 // Gets the IP I guess
 func WhatIsMyIP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, r.RemoteAddr)
-	LoggingContent := "Just received request from " + r.RemoteAddr
+	fmt.Fprintf(w, r.Header.Get("X-FORWARDED-FOR"))
+	LoggingContent := "Just received request from " + r.Header.Get("X-FORWARDED-FOR")
 	log.Println(LoggingContent)
 }
 
